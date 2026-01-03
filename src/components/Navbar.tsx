@@ -64,7 +64,7 @@ export default function Navbar() {
 
   return (
     <>
-      <div className="pl-80 flex justify-between items-center bg-off-white h-16">
+      <div className="pl-80 flex justify-between items-center bg-gray-100 h-16">
         <div className="text-3xl flex">
           <span>Logged in as: {primaryAuthorization}</span>
           {showButton ? (
@@ -115,7 +115,7 @@ export default function Navbar() {
           )}
         </div>
       </div>
-      <div className="h-screen flex flex-col overflow-y-auto bg-blue-gray w-72 fixed top-0">
+      <div className="h-screen flex flex-col overflow-y-auto bg-blue-100 w-72 fixed top-0">
         <ul className="w-full">
           <div className="h-52 mb-3 mt-3 w-full flex justify-center align-center">
             <img src={Logo} alt="logo" className="rounded-lg" />

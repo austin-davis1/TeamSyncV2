@@ -94,13 +94,13 @@ function DeleteModal({
       <div className="grid grid-cols-2 justify-items-center items-center">
         <h1
           onClick={() => handleEvent(deleteId)}
-          className="cursor-pointer w-36 h-12 text-center font-bold bg-green rounded-lg"
+          className="cursor-pointer w-36 h-12 text-center font-bold bg-green-500  rounded-lg"
         >
           Yes
         </h1>
         <h1
           onClick={() => setShowModal(false)}
-          className="cursor-pointer w-36 h-12 text-center font-bold bg-red rounded-lg"
+          className="cursor-pointer w-36 h-12 text-center font-bold bg-red-500 rounded-lg"
         >
           No
         </h1>

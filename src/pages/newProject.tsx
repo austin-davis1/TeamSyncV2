@@ -58,7 +58,7 @@ export default function NewProject() {
         ></input>
         <span
           className={
-            "mb-5" + (title.length > MAX_TITLE_CHARS ? " text-red" : "")
+            "mb-5" + (title.length > MAX_TITLE_CHARS ? " text-red-500" : "")
           }
         >
           {title.length}/{MAX_TITLE_CHARS}
@@ -69,7 +69,9 @@ export default function NewProject() {
           className="flex-grow text-2xl p-1 rounded-lg bg-white border-2 border-blue focus:outline-0 focus:shadow-none"
         ></textarea>
         <span
-          className={"mb-5" + (desc.length > MAX_DESC_CHARS ? " text-red" : "")}
+          className={
+            "mb-5" + (desc.length > MAX_DESC_CHARS ? " text-red-500" : "")
+          }
         >
           {desc.length}/{MAX_DESC_CHARS}
         </span>

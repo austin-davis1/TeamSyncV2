@@ -7,7 +7,7 @@ import { TagButton } from "./TagButton"
 export default function TaskCard({ task, setModalType, setSelectedTask }) {
   return (
     <>
-      <div className="transition-all flex flex-col duration-200 w-full h-full p-5 mt-2 mb-2 mr-5 border-solid border-2 border-black rounded-lg cursor-pointer group bg-white hover:bg-hover-gray hover:border-blue">
+      <div className="transition-all flex flex-col duration-200 w-full h-full p-5 mt-2 mb-2 mr-5 border-solid border-2 border-black rounded-lg cursor-pointer group bg-white hover:bg-hover-gray-500 hover:border-blue">
         <Link
           className="h-full"
           to={`/projects/view_project/${task.projectId}/view_task/${task._id}`}
@@ -34,7 +34,7 @@ export default function TaskCard({ task, setModalType, setSelectedTask }) {
             {task.status == 1 ? (
               <div className="flex justify-end">
                 <div
-                  className="flex hover:bg-white h-12 w-12 text-green rounded-full justify-center items-center"
+                  className="flex hover:bg-white h-12 w-12 text-green-500 rounded-full justify-center items-center"
                   onClick={() => {
                     setSelectedTask(task)
                     setModalType("Archive")
@@ -45,7 +45,7 @@ export default function TaskCard({ task, setModalType, setSelectedTask }) {
                   />
                 </div>
                 <div
-                  className="flex hover:bg-white h-12 w-12 text-red justify-center rounded-full items-center"
+                  className="flex hover:bg-white h-12 w-12 text-red-500 justify-center rounded-full items-center"
                   onClick={() => {
                     setSelectedTask(task)
                     setModalType("Delete")

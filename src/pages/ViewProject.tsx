@@ -98,7 +98,7 @@ export default function ViewProject() {
                   to="new_task"
                   className="flex h-full w-6/12 group border-dashed border-blue border-4 rounded-lg justify-center hover:bg-white hover:border-4 "
                 >
-                  <div className="flex justify-center items-center text-blue w-12 group-hover:text-red">
+                  <div className="flex justify-center items-center text-blue w-12 group-hover:text-red-500">
                     <AddCircleOutlineIcon
                       sx={{ height: "100%", width: "100%" }}
                     />

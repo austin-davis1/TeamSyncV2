@@ -153,13 +153,13 @@ export function ProjectCard({ project, profilePictures, profileUsers }) {
         </Link>
         <div className="flex flex-row self-center bg-white">
           <div
-            className="flex w-full hover:bg-white h-12 text-green justify-center rounded-full items-center"
+            className="flex w-full hover:bg-white h-12 text-green-500 justify-center rounded-full items-center"
             onClick={() => setModalAction("Archive")}
           >
             <CheckCircleOutlineIcon sx={{ height: "100%", width: "100%" }} />
           </div>
           <div
-            className="flex w-full hover:bg-white h-12 text-red justify-center rounded-full items-center"
+            className="flex w-full hover:bg-white h-12 text-red-500 justify-center rounded-full items-center"
             onClick={() => setModalAction("Delete")}
           >
             <HighlightOffIcon sx={{ height: "100%", width: "100%" }} />

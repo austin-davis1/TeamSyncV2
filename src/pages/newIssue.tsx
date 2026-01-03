@@ -113,7 +113,7 @@ export default function NewIssue() {
         ></input>
         <span
           className={
-            "mb-5" + (title.length > MAX_TITLE_CHARS ? " text-red" : "")
+            "mb-5" + (title.length > MAX_TITLE_CHARS ? " text-red-500" : "")
           }
         >
           {title.length}/{MAX_TITLE_CHARS}
@@ -124,7 +124,9 @@ export default function NewIssue() {
           className="flex-grow text-2xl p-1 rounded-lg bg-white focus:outline-0 border-2 border-blue focus:shadow-none"
         ></textarea>
         <span
-          className={"mb-5" + (desc.length > MAX_DESC_CHARS ? " text-red" : "")}
+          className={
+            "mb-5" + (desc.length > MAX_DESC_CHARS ? " text-red-500" : "")
+          }
         >
           {desc.length}/{MAX_DESC_CHARS}
         </span>

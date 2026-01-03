@@ -393,7 +393,7 @@ export default function ViewTask() {
             className="border-2 border-blue rounded-lg ml-5 mt-2 justify-center flex w-64 cursor-pointer"
             onClick={() => setCommentMode(true)}
           >
-            <div className="flex text-blue w-12 group-hover:text-red">
+            <div className="flex text-blue w-12 group-hover:text-red-500">
               <AddCircleOutlineIcon sx={{ height: "100%", width: "100%" }} />
             </div>
           </div>

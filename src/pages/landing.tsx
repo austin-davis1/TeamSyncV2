@@ -102,7 +102,7 @@ export default function Landing() {
               <div className="flex flex-col w-full justify-center mt-4">
                 <div className="flex justify-center w-full">
                   <span
-                    className="flex p-2 rounded-lg justify-center w-9/12 h-full items-center opacity-90 bg-green text-2xl cursor-pointer hover:bg-hover-gray hover:border-solid hover:border-blue hover:border-2"
+                    className="flex p-2 rounded-lg justify-center w-9/12 h-full items-center opacity-90 bg-green-500 text-2xl cursor-pointer hover:bg-hover-gray-500 hover:border-solid hover:border-blue hover:border-2"
                     onClick={() => handleLogin()}
                   >
                     Login
@@ -110,7 +110,7 @@ export default function Landing() {
                 </div>
                 <div className="flex justify-center w-full">
                   <span
-                    className="flex mt-4 rounded-lg justify-center w-9/12 h-full items-center opacity-90 bg-blue text-2xl cursor-pointer hover:bg-hover-gray"
+                    className="flex mt-4 rounded-lg justify-center w-9/12 h-full items-center opacity-90 bg-blue text-2xl cursor-pointer hover:bg-hover-gray-500"
                     onClick={() => setCreate(true)}
                   >
                     Create Account
@@ -148,7 +148,7 @@ export default function Landing() {
               <div className="flex flex-col w-full justify-center mt-4">
                 <div className="flex justify-center w-full">
                   <span
-                    className="flex p-2 rounded-lg justify-center w-9/12 h-full items-center opacity-90 bg-green text-2xl cursor-pointer hover:bg-hover-gray hover:border-solid hover:border-blue hover:border-2"
+                    className="flex p-2 rounded-lg justify-center w-9/12 h-full items-center opacity-90 bg-green-500 text-2xl cursor-pointer hover:bg-hover-gray-500 hover:border-solid hover:border-blue hover:border-2"
                     onClick={() => handleCreation()}
                   >
                     Create
@@ -156,7 +156,7 @@ export default function Landing() {
                 </div>
                 <div className="flex justify-center w-full">
                   <span
-                    className="flex mt-4 rounded-lg justify-center w-9/12 h-full items-center opacity-90 bg-red text-2xl cursor-pointer hover:bg-hover-gray"
+                    className="flex mt-4 rounded-lg justify-center w-9/12 h-full items-center opacity-90 bg-red-500 text-2xl cursor-pointer hover:bg-hover-gray-500"
                     onClick={() => setCreate(false)}
                   >
                     Cancel
