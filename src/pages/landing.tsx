@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react"
-import { verifyUser, createUser } from "../data/userData.js"
+import { verifyUser, createUser } from "../data/userData.ts"
 import { useNavigate } from "react-router-dom"
 import { useDispatch } from "react-redux"
 import logo from "../assets/images/logo.png"
-import { setDashboardView, setLoggedIn } from "../state/reduxActions.js"
+import { setDashboardView, setLoggedIn } from "../state/reduxActions.ts"
 
-export function Landing() {
+export default function Landing() {
   const navigate = useNavigate()
   let dispatch = useDispatch()
 
