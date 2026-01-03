@@ -1,32 +1,20 @@
-import { ProjectCard } from "../components/ProjectCard"
 import { Link } from "react-router-dom"
-import {
-  setRefresh,
-  setModal,
-  setProfilePictures,
-  setUsers,
-} from "../state/reduxActions.js"
 import { updateProject, deleteProject } from "../data/projectData.ts"
-import { getAllUsers } from "../data/userData.ts"
-import { getAllFiles } from "../data/storageService.js"
-import { useEffect, useState } from "react"
+import { useState, type Dispatch, type SetStateAction } from "react"
 import { Loading } from "../components/LoadingIndicator"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
+import {
+  createProfileImageQueryOptions,
+  createUsersQueryOptions,
+} from "../features/users/api/queries.ts"
+import { ProjectCard } from "../components/projectCard.tsx"
+import { createProjectsQueryOptions } from "../features/projects/api/queries.ts"
 
 export default function Projects() {
-  const [profilePictures, setProfilePicturesState] = useState(null)
-  const [imagesLoaded, setImagesLoaded] = useState(false)
-  const [users, setUsersState] = useState(null)
-  const [usersLoaded, setUsersLoaded] = useState(false)
+  const queryClient = useQueryClient()
 
-  const controller = new AbortController()
-  const awsController = new AbortController()
-
-  let dispatch = useDispatch()
-  let projects = useSelector((state) => state.projects)
-
-  let isModal = useSelector((state) => state.deleteModal)
-  let deleteId = useSelector((state) => state.selectedDelete)
-  let modalType = useSelector((state) => state.modalType)
+  const [showModal, setShowModal] = useState(false)
+  const [modalType, setModalType] = useState()
 
   async function handleEvent(id) {
     let data = projects.find((project) => project._id == id)
@@ -38,81 +26,31 @@ export default function Projects() {
       await updateProject(data)
     }
 
-    dispatch(setRefresh(true))
-    dispatch(setModal(false))
+    queryClient.invalidateQueries({ queryKey: ["projects"] })
+    setShowModal(false)
   }
 
-  let allUsers = useSelector((state) => state.users)
-  let allPictures = useSelector((state) => state.profilePictures)
+  const { data: projects } = useQuery(createProjectsQueryOptions())
 
-  useEffect(() => {
-    async function retrieveProfilePictures() {
-      let allPictures = await getAllFiles(awsController)
-      setProfilePicturesState(allPictures)
-      dispatch(setProfilePictures(allPictures))
-    }
-    async function retrieveAllUsers() {
-      let users = await getAllUsers(controller)
-      setUsersState(users)
-      dispatch(setUsers(users))
-    }
-
-    if (allUsers != null) {
-      setUsersState(allUsers)
-    } else {
-      retrieveAllUsers()
-    }
-
-    if (allPictures != null) {
-      setProfilePicturesState(allPictures)
-    } else {
-      retrieveProfilePictures()
-    }
-
-    return () => {
-      controller.abort()
-      awsController.abort()
-    }
-  }, [])
-
-  useEffect(() => {
-    if (users !== null) {
-      setUsersLoaded(true)
-    }
-  }, [users])
-
-  useEffect(() => {
-    if (profilePictures !== null) {
-      setImagesLoaded(true)
-    }
-  }, [profilePictures])
+  const { data: users, isPending: usersLoading } = useQuery(
+    createUsersQueryOptions()
+  )
+  const { data: profilePictures, isPending: imagesLoading } = useQuery(
+    createProfileImageQueryOptions()
+  )
 
   return (
     <div className="h-auto">
-      {isModal ? (
-        <>
-          <div className="flex justify-center items-center w=24">
-            <h1>Are you sure you want to {modalType} this bug?</h1>
-          </div>
-          <div className="grid grid-cols-2 justify-items-center items-center">
-            <h1
-              onClick={() => handleEvent(deleteId)}
-              className="cursor-pointer w-36 h-12 text-center font-bold bg-green rounded-lg"
-            >
-              Yes
-            </h1>
-            <h1
-              onClick={() => dispatch(setModal(false))}
-              className="cursor-pointer w-36 h-12 text-center font-bold bg-red rounded-lg"
-            >
-              No
-            </h1>
-          </div>
-        </>
+      {modalType ? (
+        <DeleteModal
+          modalType={modalType}
+          setShowModal={setShowModal}
+          handleEvent={handleEvent}
+        />
       ) : (
         <div className="flex flex-col w-full">
           <>
-            {imagesLoaded && usersLoaded ? (
+            {!imagesLoading && !usersLoading ? (
               projects.map((project) => (
                 <ProjectCard
                   key={project._id}
@@ -136,5 +74,37 @@ export default function Projects() {
         </div>
       )}
     </div>
+  )
+}
+
+function DeleteModal({
+  modalType,
+  setShowModal,
+  handleEvent,
+}: {
+  modalType: string
+  setShowModal: Dispatch<SetStateAction<boolean>>
+  handleEvent: (id: string) => void
+}) {
+  return (
+    <>
+      <div className="flex justify-center items-center">
+        <h1>Are you sure you want to {modalType} this bug?</h1>
+      </div>
+      <div className="grid grid-cols-2 justify-items-center items-center">
+        <h1
+          onClick={() => handleEvent(deleteId)}
+          className="cursor-pointer w-36 h-12 text-center font-bold bg-green rounded-lg"
+        >
+          Yes
+        </h1>
+        <h1
+          onClick={() => setShowModal(false)}
+          className="cursor-pointer w-36 h-12 text-center font-bold bg-red rounded-lg"
+        >
+          No
+        </h1>
+      </div>
+    </>
   )
 }

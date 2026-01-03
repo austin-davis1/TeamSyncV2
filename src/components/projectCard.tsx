@@ -7,14 +7,11 @@ import { PercentBar } from "./PercentBar"
 import { ProfilePictureSection } from "./ProfilePicSection"
 import NoPicture from "../assets/svgs/no_profile_picture.svg"
 import { Loading } from "./LoadingIndicator"
+import { useSuspenseQuery } from "@tanstack/react-query"
+import { createTasksQueryOptions } from "../features/tasks/api/queries"
 
 export function ProjectCard({ project, profilePictures, profileUsers }) {
   let url = `view_project/${project._id}`
-
-  console.log("PICTURES IN CARD")
-  console.log(profilePictures)
-  console.log("USERS IN CARD")
-  console.log(profileUsers)
 
   const [modalAction, setModalAction] = useState(null)
   const [modalType, setModalType] = useState({})
@@ -26,11 +23,10 @@ export function ProjectCard({ project, profilePictures, profileUsers }) {
   const [photos, setPhotos] = useState([])
   const [users, setUsers] = useState([])
 
-  let allTasks = useSelector((state) =>
-    state.bugs.filter((bug) => bug.projectId == project._id)
-  )
-  let finishedTasks = allTasks.filter((task) => task.status == 0)
-  let projectTasks = allTasks.filter((task) => task.projectId == project._id)
+  const { data: allTasks } = useSuspenseQuery(createTasksQueryOptions())
+
+  let projectTasks = allTasks.filter((bug) => bug.projectId == project._id)
+  let finishedTasks = projectTasks.filter((task) => task.status == 0)
   let projectUsers
 
   function findUsersOnProject(tasks, users) {
@@ -66,9 +62,9 @@ export function ProjectCard({ project, profilePictures, profileUsers }) {
       setPhotos(projectImages)
     }
     setUserPictures()
-    setTotalTasks(allTasks)
+    setTotalTasks(projectTasks)
     setCompletedTasks(finishedTasks)
-    setPercentComplete((finishedTasks.length / allTasks.length) * 100)
+    setPercentComplete((finishedTasks.length / projectTasks.length) * 100)
   }, [])
 
   useEffect(() => {
