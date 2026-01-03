@@ -1,15 +1,4 @@
-import { useEffect } from "react"
 import { HashRouter as Router, Route, Routes } from "react-router-dom"
-import {
-  setRefresh,
-  setLoading,
-  setData,
-  setProjects,
-} from "./state/reduxActions.ts"
-import { useSelector, useDispatch } from "react-redux"
-
-import { getAllTasks } from "./data/taskData.ts"
-import { getAllProjects } from "./data/projectData.ts"
 
 import { SiteLayout } from "./components/SiteLayout"
 
@@ -27,28 +16,6 @@ import YourTasks from "./pages/YourTasks"
 import UserTasks from "./pages/UserTasks"
 
 function App() {
-  let dispatch = useDispatch()
-
-  let user = sessionStorage.getItem("User")
-  const isLogged = useSelector((state) => state.isLoggedIn)
-
-  useEffect(() => {
-    async function loadData() {
-      dispatch(setLoading(true))
-      let allTasks = await getAllTasks()
-      let projects = await getAllProjects()
-
-      dispatch(setData(allTasks))
-      dispatch(setRefresh(false))
-      dispatch(setLoading(false))
-      dispatch(setProjects(projects))
-    }
-
-    if (user) {
-      loadData()
-    }
-  }, [useSelector((state) => state.needsRefresh)])
-
   return (
     <Router>
       <Routes>

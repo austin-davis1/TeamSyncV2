@@ -1,18 +1,14 @@
 import { useState, useEffect } from "react"
 import { verifyUser, createUser } from "../data/userData.ts"
 import { useNavigate } from "react-router-dom"
-import { useDispatch } from "react-redux"
 import logo from "../assets/images/logo.png"
-import { setDashboardView, setLoggedIn } from "../state/reduxActions.ts"
 
 export default function Landing() {
   const navigate = useNavigate()
-  let dispatch = useDispatch()
 
   const [create, setCreate] = useState(false)
   const [formError, setFormError] = useState(false)
   const [error, setError] = useState(false)
-  const [incorrect, setIncorrect] = useState(false)
 
   //Login state
   const [email, setEmail] = useState("")
@@ -45,10 +41,6 @@ export default function Landing() {
         //dispatch(setUser(user))
         sessionStorage.setItem("User", JSON.stringify(user))
         sessionStorage.setItem("View", user.authorizations[0].toString())
-        //sessionStorage.setItem("CurrentAuthorization", "Admin")
-        dispatch(setDashboardView(user.authorizations[0]))
-
-        dispatch(setLoggedIn(true))
         navigate("/dashboard")
       } else {
         alert("The information was not correct")
