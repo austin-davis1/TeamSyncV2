@@ -1,54 +1,34 @@
 import { useParams } from "react-router-dom"
 import { useState, useEffect } from "react"
-import { getAllUsers } from "../data/userData.js"
 import { updateTask } from "../data/taskData.js"
 import { setRefresh } from "../state/reduxActions.js"
 import { TagButton } from "../components/TagButton.js"
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline"
 import { allTags } from "../components/allTags.ts"
 import { BackButton } from "../components/BackButton.jsx"
+import { createTasksQueryOptions } from "../features/tasks/api/queries.ts"
+import { useSuspenseQuery } from "@tanstack/react-query"
 
 export default function ViewTask() {
   let { taskId } = useParams()
-  let { projectId } = useParams()
 
-  let allTasks = useSelector((state) => state.bugs)
-  let loading = useSelector((state) => state.isLoading)
+  const { data: allTasks, isPending } = useSuspenseQuery(
+    createTasksQueryOptions()
+  )
+
+  const { data: usersS } = useSuspenseQuery(createTasksQueryOptions())
 
   let data = allTasks.find((task) => task._id == taskId)
   let comments = data?.comments
 
-  let dateCreated
-  let dateD
-  let date
-  let updated
-  let updatedD
-  let lastUpdated
-  let creator
-  let users
-  let dateCompleted
-  let dateCom
-  let estimatedDate
-
-  if (!loading) {
-    dateCreated = data.dateCreated
-    dateD = new Date(dateCreated)
-    date = dateD.toISOString().slice(0, 10)
-
-    dateCompleted = new Date(data.dateCompleted)
-    dateCom = dateCompleted.toISOString().slice(0, 10)
-
-    let eDate = data.estimatedCompletion
-    let estDate = new Date(eDate)
-    estimatedDate = estDate.toISOString().slice(0, 10)
-
-    updated = data.lastUpdated
-    updatedD = new Date(updated)
-    lastUpdated = updatedD.toISOString().slice(0, 10)
-
-    creator = data.createdBy
-    users = data.users
-  }
+  const date = new Date(data.dateCreated).toISOString().slice(0, 10)
+  const dateCompleted = new Date(data.dateCompleted).toISOString().slice(0, 10)
+  const estimatedDate = new Date(data.estimatedCompletion)
+    .toISOString()
+    .slice(0, 10)
+  const lastUpdated = new Date(data.lastUpdated).toISOString().slice(0, 10)
+  const creator = data.createdBy
+  const users = data.users
 
   const [edit, setEdit] = useState(false)
   const [comment, setComment] = useState("")
@@ -60,38 +40,23 @@ export default function ViewTask() {
   const [error, setError] = useState(false)
   const [tags, setTags] = useState([data?.tags])
 
-  const [loadingUsers, setLoadingUsers] = useState(true)
-  const [usersS, setUsers] = useState([])
-
   const controller = new AbortController()
 
   useEffect(() => {
-    async function pullUsers() {
-      let allUsers = await getAllUsers(controller)
-      setLoadingUsers(true)
-      setUsers(allUsers)
+    if (isPending) return
+    setTitle(data.title)
+    setDesc(data.description)
+    setTags(data.tags)
+    let userArray = []
+    for (let item of data.users) {
+      userArray.push(item.username)
     }
-    pullUsers()
-  }, [])
-
-  useEffect(() => {
-    if (!loading) {
-      setTitle(data.title)
-      setDesc(data.description)
-      setTags(data.tags)
-      let userArray = []
-      for (let item of data.users) {
-        userArray.push(item.username)
-      }
-      setAssignedUsers(userArray)
-    }
-  }, [loading])
+    setAssignedUsers(userArray)
+  }, [isPending])
 
   let user = sessionStorage.getItem("User")
   let userObj = JSON.parse(user)
   let username = userObj.username
-
-  let dispatch = useDispatch()
 
   useEffect(() => {
     if (error) {
@@ -128,18 +93,19 @@ export default function ViewTask() {
     if (title === "" || desc === "") {
       setError(true)
     } else {
-      let object = {}
-
-      object.title = title
-      object.description = desc
-      object.projectId = data.projectId
-      object.dateCreated = data.dateCreated
-      object.tags = tags
-      object.createdBy = data.createdBy
-      object.lastUpdated = new Date()
-      object.comments = comments
-      object.users = data.users
-      object.status = 1
+      const { projectId, dateCreated, createdBy, users } = data
+      const object = {
+        title,
+        description: desc,
+        projectId,
+        dateCreated,
+        tags,
+        createdBy,
+        lastUpdated: new Date(),
+        comments,
+        users,
+        status: 1,
+      }
 
       updateTask(object)
       dispatch(setRefresh(true))
@@ -148,11 +114,11 @@ export default function ViewTask() {
   }
 
   function submitComment() {
-    let commentObj = {}
-
-    commentObj.commenter = username
-    commentObj.comment = comment
-    commentObj.dateCreated = new Date()
+    const commentObj = {
+      commenter: username,
+      commment,
+      dateCreated: new Date(),
+    }
 
     data.comments = [...data.comments, commentObj]
 
@@ -166,9 +132,10 @@ export default function ViewTask() {
     if (data.users.find((user) => user.username == username)) {
       object.users = object.users.filter((user) => user.username != username)
     } else {
-      let assignedUser = {}
-      assignedUser.username = username
-      assignedUser.email = userObj.email
+      const assignedUser = {
+        username,
+        email: userObj.email,
+      }
 
       object.users = [...object.users, assignedUser]
     }
@@ -182,9 +149,11 @@ export default function ViewTask() {
     object.users = []
     for (let user of assignedUsers) {
       let userObj = usersS.find((userS) => userS.username == user)
-      let appendObject = {}
-      appendObject.username = userObj.username
-      appendObject.email = userObj.email
+      const { username, email } = userObj
+      const appendObject = {
+        username,
+        email,
+      }
 
       object.users = [...object.users, appendObject]
     }
@@ -192,8 +161,6 @@ export default function ViewTask() {
     editTask(data._id, object, 1)
     dispatch(setRefresh(true))
   }
-
-  console.log(assignedUsers)
 
   return (
     <div className="h-auto">
@@ -389,7 +356,7 @@ export default function ViewTask() {
             <>
               <div className="flex flex-row justify-between mb-3 text-2xl">
                 <span className="italic">Date Completed: </span>
-                <span>{dateCom}</span>
+                <span>{dateCompleted}</span>
               </div>
               <div className="flex flex-row justify-between mb-3 text-2xl">
                 <span className="italic">Completed By: </span>
