@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react"
 import { createTask } from "../data/taskData.ts"
-import { useDispatch } from "react-redux"
 import { setRefresh } from "../state/reduxActions.ts"
 import { Link, useNavigate, useParams } from "react-router-dom"
 import DatePicker from "react-datepicker"

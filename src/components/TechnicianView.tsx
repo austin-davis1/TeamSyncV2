@@ -1,5 +1,4 @@
 import { CardSection } from "./CardSection"
-import { useSelector } from "react-redux"
 import { allTags } from "./allTags"
 import { useState, useEffect } from "react"
 import { BarGraph } from "./BarGraph"

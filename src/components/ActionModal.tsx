@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react"
 import { updateTask, deleteTask } from "../data/taskData.js"
 import { updateProject, completeProject } from "../data/projectData.js"
-import { useDispatch } from "react-redux"
 import { setRefresh } from "../state/reduxActions.js"
 
 export function ActionModal({ type, data, showModal, setShowModal }) {

@@ -1,4 +1,3 @@
-import { useSelector } from "react-redux"
 import { useState, useEffect } from "react"
 import Card from "../components/Card"
 import { getAllUsers } from "../data/userData.ts"

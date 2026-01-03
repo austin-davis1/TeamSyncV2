@@ -1,5 +1,4 @@
 import { ProjectCard } from "../components/ProjectCard"
-import { useSelector, useDispatch } from "react-redux"
 import { Link } from "react-router-dom"
 import {
   setRefresh,
