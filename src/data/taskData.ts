@@ -1,6 +1,6 @@
 import Api from "./trackerApi.ts"
 import config from "../config/index.ts"
-import { TasksSchema } from "../features/tasks/api/schemas.ts"
+import { TasksSchema, type Task } from "../features/tasks/api/schemas.ts"
 
 //TODO: Rather than referencing the dev
 //endpoint directly, this would be set according
@@ -27,7 +27,7 @@ export async function getAllTasks() {
  * @param {string} projectId - Id of the project the tasks are attached to
  * @returns {Promise<Object[]>} - Array of tasks for the specified project
  */
-export async function getTasksByProjectId(projectId) {
+export async function getTasksByProjectId(projectId: string) {
   const apiPath = `/projects/${projectId}/tasks`
   const response = await api.get(apiPath)
 
@@ -43,7 +43,7 @@ export async function getTasksByProjectId(projectId) {
  * @param {Object} newTask - Task to be created
  * @returns {Promise}
  */
-export async function createTask(newTask) {
+export async function createTask(newTask: Task) {
   const apiPath = "/tasks"
   const response = await api.post(apiPath, JSON.stringify(newTask))
 
@@ -62,8 +62,8 @@ export async function createTask(newTask) {
  * @param {Object} existingTask - Task to be updated
  * @returns {Promise}
  */
-export async function updateTask(existingTask) {
-  const apiPath = `/tasks/${existingTask.id}`
+export async function updateTask(existingTask: Task) {
+  const apiPath = `/tasks/${existingTask._id}`
   const response = await api.put(apiPath, JSON.stringify(existingTask))
 
   //For an update, the client should already have
@@ -80,7 +80,7 @@ export async function updateTask(existingTask) {
  * @param {string} taskId - Id of the task to be deleted
  * @returns {Promise}
  */
-export async function deleteTask(taskId) {
+export async function deleteTask(taskId: string) {
   const apiPath = `/tasks/${taskId}`
   const response = await api.delete(apiPath, taskId)
 

@@ -7,7 +7,8 @@ import { BackButton } from "../components/BackButton"
 import { useSuspenseQuery } from "@tanstack/react-query"
 import { createTasksQueryOptions } from "../features/tasks/api/queries"
 import { createProjectsQueryOptions } from "../features/projects/api/queries"
-import { ActionModal } from "../components/TaskActionModal"
+import { TaskActionModal } from "../components/TaskActionModal"
+import type { Task } from "../features/tasks/api/schemas"
 
 export type TaskModalType = "Archive" | "Delete" | "Revert"
 
@@ -21,7 +22,7 @@ export default function ViewProject() {
   const loading = loadingTasks || loadingProjects
 
   const [modalType, setModalType] = useState<TaskModalType>()
-  const [selectedTask, setSelectedTask] = useState()
+  const [selectedTask, setSelectedTask] = useState<Task>()
 
   const [wipTaskCount, setWipTaskCount] = useState(6)
   const [completedTaskCount, setCompletedTaskCount] = useState(4)
@@ -32,8 +33,8 @@ export default function ViewProject() {
 
   return (
     <div className="h-auto">
-      {modalType && (
-        <ActionModal
+      {modalType && selectedTask && (
+        <TaskActionModal
           type={modalType}
           setModalType={setModalType}
           task={selectedTask}
@@ -45,7 +46,7 @@ export default function ViewProject() {
             <BackButton />
             <div className="flex mt-8">
               <h1 className="flex w-full text-blue mb-10 rounded-lg text-7xl font-bold justify-left">
-                {projectData.title}
+                {projectData?.title}
               </h1>
             </div>
             <div className="w-full justify-items-center">

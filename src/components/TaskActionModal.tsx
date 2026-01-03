@@ -2,18 +2,20 @@ import { type Dispatch, type SetStateAction } from "react"
 import { updateTask, deleteTask } from "../data/taskData.js"
 import type { TaskModalType } from "../pages/ViewProject.js"
 import { useQueryClient } from "@tanstack/react-query"
+import type { Task } from "../features/tasks/api/schemas.js"
 
-export function ActionModal({
+export function TaskActionModal({
   type,
   setModalType,
   task,
 }: {
   type: TaskModalType
   setModalType: Dispatch<SetStateAction<TaskModalType | undefined>>
+  task: Task
 }) {
   const queryClient = useQueryClient()
 
-  const user = sessionStorage.getItem("User")
+  const user = sessionStorage?.getItem("User") ?? ""
   const userObj = JSON.parse(user)
 
   const title = titleOptions[type]

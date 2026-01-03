@@ -1,4 +1,5 @@
 import { z } from "zod"
+import { allTags } from "../../../components/allTags"
 
 export const isoDateString = z
   .string()
@@ -34,7 +35,7 @@ export const TaskSchema = z.object({
 
   status: z.number(),
 
-  tags: z.array(z.string()).optional(),
+  tags: z.array(z.literal(allTags)).optional(),
   comments: z.array(CommentSchema).optional(),
 
   createdBy: z.string(),
@@ -46,5 +47,7 @@ export const TaskSchema = z.object({
 
   estimatedCompletion: isoDateString.nullable().optional(),
 })
+
+export type Task = z.infer<typeof TaskSchema>
 
 export const TasksSchema = z.array(TaskSchema)

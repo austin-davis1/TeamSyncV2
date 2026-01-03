@@ -2,7 +2,7 @@ import { Link } from "react-router-dom"
 import HighlightOffIcon from "@mui/icons-material/HighlightOff"
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline"
 import { useState, useEffect } from "react"
-import { ActionModal } from "./TaskActionModal"
+import { TaskActionModal } from "./TaskActionModal"
 import { PercentBar } from "./PercentBar"
 import { ProfilePictureSection } from "./ProfilePicSection"
 import NoPicture from "../assets/svgs/no_profile_picture.svg"
@@ -99,7 +99,7 @@ export function ProjectCard({ project, profilePictures, profileUsers }) {
   return (
     <>
       {showModal && (
-        <ActionModal
+        <TaskActionModal
           type={modalType}
           data={selectedData}
           showModal={showModal}

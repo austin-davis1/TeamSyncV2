@@ -1,62 +1,53 @@
 import { useParams } from "react-router-dom"
-import { useState, useEffect } from "react"
+import { useEffect, useState } from "react"
 import { updateTask } from "../data/taskData.js"
-import { setRefresh } from "../state/reduxActions.js"
 import { TagButton } from "../components/TagButton.js"
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline"
-import { allTags } from "../components/allTags.ts"
+import { allTags, type Tag } from "../components/allTags.ts"
 import { BackButton } from "../components/BackButton.jsx"
 import { createTasksQueryOptions } from "../features/tasks/api/queries.ts"
-import { useSuspenseQuery } from "@tanstack/react-query"
+import { useQueryClient, useSuspenseQuery } from "@tanstack/react-query"
+import { createUsersQueryOptions } from "../features/users/api/queries.ts"
 
 export default function ViewTask() {
   let { taskId } = useParams()
+  const queryClient = useQueryClient()
 
-  const { data: allTasks, isPending } = useSuspenseQuery(
-    createTasksQueryOptions()
-  )
+  const { data: allTasks } = useSuspenseQuery(createTasksQueryOptions())
 
-  const { data: usersS } = useSuspenseQuery(createTasksQueryOptions())
+  const { data: allUsers } = useSuspenseQuery(createUsersQueryOptions())
 
-  let data = allTasks.find((task) => task._id == taskId)
-  let comments = data?.comments
-
-  const date = new Date(data.dateCreated).toISOString().slice(0, 10)
-  const dateCompleted = new Date(data.dateCompleted).toISOString().slice(0, 10)
-  const estimatedDate = new Date(data.estimatedCompletion)
-    .toISOString()
-    .slice(0, 10)
-  const lastUpdated = new Date(data.lastUpdated).toISOString().slice(0, 10)
-  const creator = data.createdBy
-  const users = data.users
-
+  const [comment, setComment] = useState<string>()
   const [edit, setEdit] = useState(false)
-  const [comment, setComment] = useState("")
   const [assign, setAssign] = useState(false)
-  const [assignedUsers, setAssignedUsers] = useState([])
   const [commentMode, setCommentMode] = useState(false)
-  const [title, setTitle] = useState(data?.title)
-  const [desc, setDesc] = useState(data?.description)
   const [error, setError] = useState(false)
-  const [tags, setTags] = useState([data?.tags])
 
-  const controller = new AbortController()
+  const task = allTasks.find((task) => task._id == taskId)
+  if (!task) throw new Error("Task could not be found")
+  const {
+    title,
+    description,
+    tags,
+    comments,
+    dateCreated,
+    dateCompleted: dateC,
+    estimatedCompletion: estimatedC,
+    lastUpdated: lastUp,
+    createdBy: creator,
+    users,
+  } = task
 
-  useEffect(() => {
-    if (isPending) return
-    setTitle(data.title)
-    setDesc(data.description)
-    setTags(data.tags)
-    let userArray = []
-    for (let item of data.users) {
-      userArray.push(item.username)
-    }
-    setAssignedUsers(userArray)
-  }, [isPending])
+  const date = new Date(dateCreated || "").toISOString().slice(0, 10)
+  const dateCompleted = dateC
+    ? new Date(dateC || "").toISOString().slice(0, 10)
+    : undefined
+  const estimatedDate = new Date(estimatedC || "").toISOString().slice(0, 10)
+  const lastUpdated = new Date(lastUp || "").toISOString().slice(0, 10)
 
-  let user = sessionStorage.getItem("User")
-  let userObj = JSON.parse(user)
-  let username = userObj.username
+  const user = sessionStorage?.getItem("User") ?? ""
+  const userObj = JSON.parse(user)
+  const username = userObj.username
 
   useEffect(() => {
     if (error) {
@@ -65,71 +56,57 @@ export default function ViewTask() {
     }
   }, [error])
 
-  function handleClick(tag) {
-    if (tags.find((ptag) => ptag == tag)) {
-      setTags((current) =>
-        current.filter((ptag) => {
-          return ptag !== tag
-        })
-      )
-    } else {
-      setTags([...tags, tag])
-    }
+  async function handleTagClick(tag: Tag) {
+    if (!task) return
+    const newTags = tags
+      ? tags.includes(tag)
+        ? tags?.filter((currentTag) => currentTag !== tag)
+        : [...tags, tag]
+      : []
+    await updateTask({ ...task, tags: newTags })
+    queryClient.invalidateQueries({ queryKey: ["tasks"] })
   }
 
-  function handleUsers(userClicked) {
-    if (assignedUsers.find((user) => user == userClicked)) {
-      setAssignedUsers((current) =>
-        current.filter((user) => {
-          return user !== userClicked
-        })
-      )
-    } else {
-      setAssignedUsers([...assignedUsers, userClicked])
-    }
+  async function handleUsers(userClicked: string) {
+    const user = allUsers.find((user) => user.name === userClicked)
+    if (!user || !task) return
+    const newUsers = users
+      ? users.find((user) => user.username === userClicked)
+        ? users?.filter((user) => user.username !== userClicked)
+        : [...users, user]
+      : []
+    await updateTask({ ...task, users: newUsers })
+    queryClient.invalidateQueries({ queryKey: ["tasks"] })
   }
 
   function submitEdit() {
-    if (title === "" || desc === "") {
-      setError(true)
-    } else {
-      const { projectId, dateCreated, createdBy, users } = data
-      const object = {
-        title,
-        description: desc,
-        projectId,
-        dateCreated,
-        tags,
-        createdBy,
-        lastUpdated: new Date(),
-        comments,
-        users,
-        status: 1,
-      }
-
-      updateTask(object)
-      dispatch(setRefresh(true))
-      setEdit(false)
-    }
+    if (!task) return
+    if (title === "" || description === "") return setError(true)
+    updateTask({
+      ...task,
+      description,
+      lastUpdated: new Date().toLocaleDateString(),
+    })
+    queryClient.invalidateQueries({ queryKey: ["tasks"] })
+    setEdit(false)
   }
 
   function submitComment() {
-    const commentObj = {
+    if (!task || !task.comments || !comment) return
+    const newComment = {
       commenter: username,
-      commment,
-      dateCreated: new Date(),
+      comment,
+      dateCreated: new Date().toLocaleDateString(),
     }
 
-    data.comments = [...data.comments, commentObj]
-
-    editTask(data._id, data, data.status)
-    dispatch(setRefresh(true))
+    updateTask({ ...task, comments: [...task.comments, newComment] })
+    queryClient.invalidateQueries({ queryKey: ["tasks"] })
     setCommentMode(false)
   }
 
   function assignTask() {
-    let object = data
-    if (data.users.find((user) => user.username == username)) {
+    let object = task
+    if (users.find((user) => user.username == username)) {
       object.users = object.users.filter((user) => user.username != username)
     } else {
       const assignedUser = {
@@ -140,15 +117,15 @@ export default function ViewTask() {
       object.users = [...object.users, assignedUser]
     }
 
-    editTask(data._id, object, 1)
-    dispatch(setRefresh(true))
+    editTask(task._id, object, 1)
+    queryClient.invalidateQueries({ queryKey: ["tasks"] })
   }
 
   function assignTaskToOthers() {
-    let object = data
+    const object = { ...task, users: [] }
     object.users = []
     for (let user of assignedUsers) {
-      let userObj = usersS.find((userS) => userS.username == user)
+      let userObj = allUsers.find((userS) => userS.username == user)
       const { username, email } = userObj
       const appendObject = {
         username,
@@ -158,8 +135,8 @@ export default function ViewTask() {
       object.users = [...object.users, appendObject]
     }
 
-    editTask(data._id, object, 1)
-    dispatch(setRefresh(true))
+    editTask(task._id, object, 1)
+    queryClient.invalidateQueries({ queryKey: ["tasks"] })
   }
 
   return (
@@ -176,7 +153,7 @@ export default function ViewTask() {
               </div>
               <div className="mt-4">
                 <span className="font-bold text-2xl">Bug Description:</span>
-                <h2 className="text-lg">{desc}</h2>
+                <h2 className="text-lg">{description}</h2>
               </div>
               {tags && (
                 <div className="mt-10">
@@ -186,7 +163,7 @@ export default function ViewTask() {
                 </div>
               )}
             </div>
-            {data.status == 1 ? (
+            {task.status == 1 ? (
               <div className="flex flex-row">
                 <div
                   className="flex justify-center rounded-lg text-white bg-blue border-solid border-blue cursor-pointer m-5 border-solid border-2 w-48"
@@ -198,7 +175,7 @@ export default function ViewTask() {
                   className="flex justify-center rounded-lg text-white bg-blue border-solid border-blue cursor-pointer m-5 border-solid border-2 w-48"
                   onClick={() => assignTask()}
                 >
-                  {data?.users.find((user) => user.username == username) ? (
+                  {users.find((user) => user.username == username) ? (
                     <span>Unassign To Self</span>
                   ) : (
                     <span>Assign To Self</span>
@@ -238,9 +215,9 @@ export default function ViewTask() {
                         aria-labelledby="menu-button"
                       >
                         <div className="py-1 flex w-full flex-col">
-                          {usersS.map((user) => {
+                          {allUsers.map((user) => {
                             return (
-                              <span
+                              <button
                                 className={
                                   "cursor-pointer hover:bg-off-white block px-4 py-2 " +
                                   (assignedUsers.find(
@@ -252,7 +229,7 @@ export default function ViewTask() {
                                 onClick={() => handleUsers(user.username)}
                               >
                                 {user.username}
-                              </span>
+                              </button>
                             )
                           })}
                           <div className="flex flex-row justify-between px-4">
@@ -262,12 +239,12 @@ export default function ViewTask() {
                             >
                               Submit
                             </span>
-                            <span
+                            <button
                               className="flex justify-center cursor-pointer w-full hover:bg-off-white"
                               onClick={() => setAssign(false)}
                             >
                               Cancel
-                            </span>
+                            </button>
                           </div>
                         </div>
                       </div>
@@ -290,7 +267,7 @@ export default function ViewTask() {
                 <input
                   className="text-3xl text-black truncate rounded-lg font-bold p-2"
                   onChange={(e) => setTitle(e.target.value)}
-                  placeholder={data?.title}
+                  placeholder={task?.title}
                 />
               </div>
               <div className="flex-col flex mt-4">
@@ -298,7 +275,7 @@ export default function ViewTask() {
                 <input
                   className="text-lg border-2 rounded-lg h-24"
                   onChange={(e) => setDesc(e.target.value)}
-                  placeholder={data?.description}
+                  placeholder={task?.description}
                 />
               </div>
               <div className="flex flex-row justify-between mt-6">
@@ -306,7 +283,7 @@ export default function ViewTask() {
                   {allTags.map((tag) => {
                     return (
                       <button
-                        onClick={() => handleClick(tag)}
+                        onClick={() => handleTagClick(tag)}
                         className={
                           "w-24 h-12 hover:bg-off-white rounded-lg mr-2 " +
                           (tags.find((ptag) => ptag == tag) ? "bg-blue" : " ")
@@ -352,7 +329,7 @@ export default function ViewTask() {
             <span className="italic">Last Updated: </span>
             <span>{lastUpdated}</span>
           </div>
-          {data.dateCompleted !== null ? (
+          {task.dateCompleted !== null ? (
             <>
               <div className="flex flex-row justify-between mb-3 text-2xl">
                 <span className="italic">Date Completed: </span>
@@ -360,7 +337,7 @@ export default function ViewTask() {
               </div>
               <div className="flex flex-row justify-between mb-3 text-2xl">
                 <span className="italic">Completed By: </span>
-                <span>{data.completedBy}</span>
+                <span>{task.completedBy}</span>
               </div>
             </>
           ) : (
@@ -402,7 +379,7 @@ export default function ViewTask() {
             <input
               onChange={(e) => setComment(e.target.value)}
               className="pl-2"
-            ></input>
+            />
             <div className="flex w-full justify-between">
               <button
                 onClick={() => submitComment()}
