@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import Card from "../components/Card"
+import TaskCard from "../components/TaskCard"
 import { Link } from "react-router-dom"
 
 export default function YourTasks() {
@@ -103,7 +103,7 @@ export default function YourTasks() {
                   {tasks
                     .filter((task) => task.projectId == project._id)
                     .map((task) => {
-                      return <Card issue={task} />
+                      return <TaskCard issue={task} />
                     })}
                 </div>
               </>

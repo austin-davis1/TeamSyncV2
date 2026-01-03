@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom"
-import Card from "../components/Card"
+import TaskCard from "../components/TaskCard"
 import { Link } from "react-router-dom"
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline"
 import { useState } from "react"
@@ -7,6 +7,9 @@ import { BackButton } from "../components/BackButton"
 import { useSuspenseQuery } from "@tanstack/react-query"
 import { createTasksQueryOptions } from "../features/tasks/api/queries"
 import { createProjectsQueryOptions } from "../features/projects/api/queries"
+import { ActionModal } from "../components/TaskActionModal"
+
+export type TaskModalType = "Archive" | "Delete" | "Revert"
 
 export default function ViewProject() {
   const { data: allTasks, isPending: loadingTasks } = useSuspenseQuery(
@@ -17,6 +20,9 @@ export default function ViewProject() {
   )
   const loading = loadingTasks || loadingProjects
 
+  const [modalType, setModalType] = useState<TaskModalType>()
+  const [selectedTask, setSelectedTask] = useState()
+
   const [wipTaskCount, setWipTaskCount] = useState(6)
   const [completedTaskCount, setCompletedTaskCount] = useState(4)
 
@@ -26,6 +32,13 @@ export default function ViewProject() {
 
   return (
     <div className="h-auto">
+      {modalType && (
+        <ActionModal
+          type={modalType}
+          setModalType={setModalType}
+          task={selectedTask}
+        />
+      )}
       {!loading ? (
         <>
           <>
@@ -50,9 +63,14 @@ export default function ViewProject() {
                     ?.filter((task) => task.status === 1)
                     ?.slice(0, wipTaskCount)
                     ?.map((bug) => {
-                      if (bug.status === 1) {
-                        return <Card key={bug._id} issue={bug} />
-                      }
+                      return (
+                        <TaskCard
+                          key={bug._id}
+                          task={bug}
+                          setSelectedTask={setSelectedTask}
+                          setModalType={setModalType}
+                        />
+                      )
                     })
                 )}
               </div>
@@ -101,7 +119,14 @@ export default function ViewProject() {
                     ?.filter((task) => task.status === 0)
                     ?.slice(0, completedTaskCount)
                     .map((bug) => {
-                      return <Card key={bug._id} issue={bug} />
+                      return (
+                        <TaskCard
+                          key={bug._id}
+                          task={bug}
+                          setSelectedTask={setSelectedTask}
+                          setModalType={setModalType}
+                        />
+                      )
                     })
                 )}
               </div>

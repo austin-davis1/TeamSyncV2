@@ -1,4 +1,4 @@
-import Card from "./Card"
+import TaskCard from "./TaskCard.tsx"
 import { useState, useEffect } from "react"
 import { allTags } from "./allTags.ts"
 import { Loading } from "./LoadingIndicator"
@@ -62,7 +62,7 @@ export function CardSection({ cards, title }) {
       {!loadingTasks ? (
         <div className="flex flex-col">
           {selectedTasks?.slice(0, MAX_TASKS)?.map((card) => {
-            return <Card issue={card} key={card._id} />
+            return <TaskCard issue={card} key={card._id} />
           })}
         </div>
       ) : (
