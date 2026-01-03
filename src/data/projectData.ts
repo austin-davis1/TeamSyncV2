@@ -2,6 +2,7 @@ import Api from "./trackerApi.ts"
 import config from "../config/index.ts"
 
 import { getTasksByProjectId, updateTask } from "./taskData.ts"
+import { ProjectsSchema } from "../features/projects/api/schemas.ts"
 
 //TODO: Rather than referencing the dev
 //endpoint directly, this would be set according
@@ -19,11 +20,8 @@ export async function getAllProjects() {
   const apiPath = "/projects"
   const response = await api.get(apiPath)
 
-  if (response.success) {
-    return response.data
-  } else {
-    throw new Error(response.statusText)
-  }
+  if (!response.success) throw new Error(response.statusText)
+  return ProjectsSchema.parse(response.data)
 }
 
 /**

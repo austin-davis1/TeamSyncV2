@@ -1,5 +1,6 @@
 import Api from "./trackerApi.js"
 import config from "../config/index.ts"
+import { UsersSchema } from "../features/users/api/schemas.ts"
 
 //TODO: Rather than referencing the dev
 //endpoint directly, this would be set according
@@ -16,11 +17,8 @@ export async function getAllUsers() {
   const apiPath = "/users"
   const response = await api.get(apiPath)
 
-  if (response.success) {
-    return response.data
-  } else {
-    throw new Error(response.statusText)
-  }
+  if (!response.success) throw new Error(response.statusText)
+  return UsersSchema.parse(response.data)
 }
 
 /**
