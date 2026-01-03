@@ -5,7 +5,7 @@ import { useState, useEffect } from "react"
 import { ActionModal } from "./ActionModal"
 import { PercentBar } from "./PercentBar"
 import { ProfilePictureSection } from "./ProfilePicSection"
-import NoPicture from "../assets/no_profile_picture.svg"
+import NoPicture from "../assets/svgs/no_profile_picture.svg"
 import { Loading } from "./LoadingIndicator"
 
 export function ProjectCard({ project, profilePictures, profileUsers }) {
