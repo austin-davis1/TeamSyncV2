@@ -2,11 +2,8 @@ import { NavLink, useNavigate, Link } from "react-router-dom"
 import { sideData, adminSideData } from "./sidebardata"
 
 import Logo from "../assets/images/logo.png"
-import picture from "../assets/svgs/no_profile_picture.svg"
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { ProfilePicture } from "./ProfilePic"
-import { getFile } from "../data/storageService"
-import { setDashboardView, setLoggedIn } from "../state/reduxActions"
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown"
 
 export default function Navbar() {
@@ -15,7 +12,6 @@ export default function Navbar() {
   const [auth, setAuth] = useState("")
   const [showButton, setShowButton] = useState(false)
 
-  const dispatch = useDispatch()
   let user = sessionStorage.getItem("User")
   let userObj = JSON.parse(user)
 
@@ -29,45 +25,42 @@ export default function Navbar() {
 
   function handleLogout() {
     sessionStorage.removeItem("User")
-    dispatch(setLoggedIn(false))
     navigate("/")
   }
 
   function changeView() {
     if (auth == "Admin") {
       setAuth("User")
-      dispatch(setDashboardView("User"))
       sessionStorage.setItem("View", "User")
     } else if (auth == "User") {
       setAuth("Admin")
-      dispatch(setDashboardView("Admin"))
       sessionStorage.setItem("View", "Admin")
     }
   }
 
-  useEffect(() => {
-    async function loadProfilePhoto() {
-      //If a valid image is found, show it, otherwise
-      //default to the no photo svg icon.
-      let photoSrc = picture
-      if (userObj && userObj.pictureID) {
-        photoSrc = await getFile(userObj.pictureID)
-      }
+  // useEffect(() => {
+  //   async function loadProfilePhoto() {
+  //     //If a valid image is found, show it, otherwise
+  //     //default to the no photo svg icon.
+  //     let photoSrc = picture
+  //     if (userObj && userObj.pictureID) {
+  //       photoSrc = await getFile(userObj.pictureID)
+  //     }
 
-      setPhoto(photoSrc)
-    }
-    loadProfilePhoto()
+  //     setPhoto(photoSrc)
+  //   }
+  //   loadProfilePhoto()
 
-    if (
-      userObj.authorizations.find((authorization) => authorization == "Admin")
-    ) {
-      setAuth("Admin")
-      setShowButton(true)
-    } else {
-      setAuth("User")
-      setShowButton(false)
-    }
-  }, [])
+  //   if (
+  //     userObj.authorizations.find((authorization) => authorization == "Admin")
+  //   ) {
+  //     setAuth("Admin")
+  //     setShowButton(true)
+  //   } else {
+  //     setAuth("User")
+  //     setShowButton(false)
+  //   }
+  // }, [])
 
   return (
     <>

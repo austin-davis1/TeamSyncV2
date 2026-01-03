@@ -6,11 +6,19 @@ import { BarGraph } from "./BarGraph"
 import { PieChart } from "./PieChart"
 import { Loading } from "./LoadingIndicator"
 import { PercentBar } from "./PercentBar"
+import { createTasksQueryOptions } from "../features/tasks/api/queries"
+import { useSuspenseQuery } from "@tanstack/react-query"
+import { createProjectsQueryOptions } from "../features/projects/api/queries"
 
 export function AdminView() {
-  let allTasks = useSelector((state) => state.bugs)
-  let allProjects = useSelector((state) => state.projects)
-  let loading = useSelector((state) => state.isLoading)
+  const { data: allTasks, isPending } = useSuspenseQuery(
+    createTasksQueryOptions()
+  )
+  const { data: allProjects, isPending: isPendingProjects } = useSuspenseQuery(
+    createProjectsQueryOptions()
+  )
+
+  const loading = isPending || isPendingProjects
 
   const [tasks, setTasks] = useState([])
   const [projects, setProjects] = useState([])
@@ -40,7 +48,7 @@ export function AdminView() {
     setTasks(allTasks)
     setActiveTasks(allTasks.filter((task) => task.status == 1))
     setProjects(allProjects)
-  }, [useSelector((state) => state.isLoading)])
+  }, [])
 
   useEffect(() => {
     function calculatePercentages(tags) {

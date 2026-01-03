@@ -3,7 +3,7 @@ import { uploadFile, getFile, deleteFile } from "../data/storageService.ts"
 import { updateUser } from "../data/userData.ts"
 import picture from "../assets/svgs/no_profile_picture.svg"
 
-import { ProfilePicture } from "../components/ProfilePic.jsx"
+import { ProfilePicture } from "../components/ProfilePic.js"
 
 export default function UserProfile() {
   const [photo, setPhoto] = useState([])

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import Card from "../components/Card"
+import Card from "../components/Card.tsx"
 import { getAllUsers } from "../data/userData.ts"
 import { useParams } from "react-router-dom"
 import { BackButton } from "../components/BackButton"

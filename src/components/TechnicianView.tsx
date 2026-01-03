@@ -6,11 +6,19 @@ import { PieChart } from "./PieChart"
 import { Loading } from "./LoadingIndicator"
 import { PercentBar } from "./PercentBar"
 import { UpcomingTasks } from "./UpcomingTasks"
+import { useSuspenseQuery } from "@tanstack/react-query"
+import { createTasksQueryOptions } from "../features/tasks/api/queries"
+import { createProjectsQueryOptions } from "../features/projects/api/queries"
 
 export function TechView() {
-  let allTasks = useSelector((state) => state.bugs)
-  let allProjects = useSelector((state) => state.projects)
-  let loading = useSelector((state) => state.isLoading)
+  const { data: allTasks, isPending } = useSuspenseQuery(
+    createTasksQueryOptions()
+  )
+  const { data: allProjects, isPending: isPendingProjects } = useSuspenseQuery(
+    createProjectsQueryOptions()
+  )
+
+  const loading = isPending || isPendingProjects
 
   const [userTasks, setUserTasks] = useState([])
   const [userProjects, setUserProjects] = useState([])

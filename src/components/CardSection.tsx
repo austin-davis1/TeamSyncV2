@@ -1,6 +1,6 @@
 import Card from "./Card"
 import { useState, useEffect } from "react"
-import { allTags } from "./allTags"
+import { allTags } from "./allTags.ts"
 import { Loading } from "./LoadingIndicator"
 import { Link } from "react-router-dom"
 

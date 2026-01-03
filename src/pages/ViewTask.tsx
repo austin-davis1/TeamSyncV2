@@ -3,9 +3,9 @@ import { useState, useEffect } from "react"
 import { getAllUsers } from "../data/userData.js"
 import { updateTask } from "../data/taskData.js"
 import { setRefresh } from "../state/reduxActions.js"
-import { TagButton } from "../components/tagButton"
+import { TagButton } from "../components/TagButton.js"
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline"
-import { allTags } from "../components/allTags"
+import { allTags } from "../components/allTags.ts"
 import { BackButton } from "../components/BackButton.jsx"
 
 export default function ViewTask() {

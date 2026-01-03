@@ -8,7 +8,6 @@ import { useState, useEffect } from "react"
 
 export default function Card({ issue }) {
   let url
-  let dispatch = useDispatch()
 
   const [modalAction, setModalAction] = useState(null)
   const [modalType, setModalType] = useState({})
