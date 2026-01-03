@@ -1,44 +1,24 @@
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import TaskCard from "../components/TaskCard"
 import { Link } from "react-router-dom"
+import { useSuspenseQuery } from "@tanstack/react-query"
+import { createTasksQueryOptions } from "../features/tasks/api/queries"
+import { createProjectsQueryOptions } from "../features/projects/api/queries"
 
-export default function YourTasks() {
-  const [tasks, setTasks] = useState([])
-  const [projects, setProjects] = useState([])
+export default function MyTasks() {
   const [projectFilter, setProjectFilter] = useState(null)
 
-  let user = sessionStorage.getItem("User")
-  let userObj = JSON.parse(user)
-  let username = userObj.username
+  const user = sessionStorage.getItem("User")
+  const userObj = JSON.parse(user)
+  const username = userObj.username
 
-  let allTasks = useSelector((state) => state.bugs)
-  let allProjects = useSelector((state) => state.projects)
+  const { data: allTasks } = useSuspenseQuery(createTasksQueryOptions())
+  const { data: allProjects } = useSuspenseQuery(createProjectsQueryOptions())
 
-  useEffect(() => {
-    let activeTasks = []
-    let activeProjects = []
-
-    function findProjects() {
-      for (let project of allProjects) {
-        if (activeTasks.find((task) => task.projectId == project._id)) {
-          activeProjects.push(project)
-        }
-      }
-      setProjects(activeProjects)
-    }
-
-    function findTasks() {
-      for (let task of allTasks) {
-        if (task.users.find((user) => user.username == username)) {
-          activeTasks.push(task)
-        }
-      }
-      setTasks(activeTasks)
-    }
-
-    findTasks()
-    findProjects()
-  }, [])
+  const tasks = allTasks.filter((task) => task.users.includes(username))
+  const projects = allProjects.filter((project) =>
+    tasks.find((task) => task.projectId === project._id)
+  )
 
   return (
     <>
@@ -100,11 +80,9 @@ export default function YourTasks() {
                   </div>
                 </Link>
                 <div className="flex flex-col ml-24">
-                  {tasks
-                    .filter((task) => task.projectId == project._id)
-                    .map((task) => {
-                      return <TaskCard issue={task} />
-                    })}
+                  {tasks.map((task) => {
+                    return <TaskCard key={task._id} task={task} />
+                  })}
                 </div>
               </>
             )

@@ -24,8 +24,6 @@ export function CardSection({ cards, title }) {
     setLoadingTasks(false)
   }, [filter])
 
-  useEffect(() => {}, [])
-
   return (
     <div className="flex flex-col w-full h-full rounded-lg p-2">
       <div className="flex flex-row items-center justify-between mb-1">
@@ -62,7 +60,7 @@ export function CardSection({ cards, title }) {
       {!loadingTasks ? (
         <div className="flex flex-col">
           {selectedTasks?.slice(0, MAX_TASKS)?.map((card) => {
-            return <TaskCard issue={card} key={card._id} />
+            return <TaskCard task={card} key={card._id} />
           })}
         </div>
       ) : (

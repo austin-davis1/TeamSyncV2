@@ -12,7 +12,7 @@ import ManageUsers from "./pages/ManageUsers.tsx"
 import Projects from "./pages/Projects"
 import UserProfile from "./pages/UserProfile"
 
-import YourTasks from "./pages/YourTasks"
+import MyTasks from "./pages/MyTasks.tsx"
 import UserTasks from "./pages/UserTasks"
 
 function App() {
@@ -38,7 +38,7 @@ function App() {
           />
           <Route path="/user_profile" element={<UserProfile />} />
           <Route path="/manage_users" element={<ManageUsers />} />
-          <Route path="/your_tasks" element={<YourTasks />} />
+          <Route path="/your_tasks" element={<MyTasks />} />
           <Route path="/user_tasks/:userId" element={<UserTasks />} />
         </Route>
       </Routes>
